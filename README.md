@@ -1,0 +1,1 @@
+# rinha-backend-rust
