@@ -1,22 +1,16 @@
-use axum::{routing::get, Router};
+use actix_web::{App, HttpServer};
 use std::net::SocketAddr;
-use tower_http::cors::{Any, CorsLayer};
+
+mod controllers;
+use controllers::person;
 
 #[tokio::main]
-async fn main() {
-    let cors = CorsLayer::new().allow_origin(Any);
-
-    let app = Router::new().route("/", get(root)).layer(cors);
-
+async fn main() -> std::io::Result<()> {
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     println!("listening on {}", addr);
 
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
+    HttpServer::new(|| App::new().service(person::echo).service(person::hello))
+        .bind(&addr)?
+        .run()
         .await
-        .unwrap();
-}
-
-async fn root() -> &'static str {
-    "Hello, World!"
 }
